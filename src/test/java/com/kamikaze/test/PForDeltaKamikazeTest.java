@@ -50,13 +50,12 @@ public class PForDeltaKamikazeTest extends TestCase
     
     int[] numArray = new int[set.size()];
     
-    //Arrays.sort(numArray);
-    
     int i = 0;
     for (int n : set){
       numArray[i++] = n;
     }
     
+    Arrays.sort(numArray);
     PForDeltaDocIdSet docset = new PForDeltaDocIdSet();
     
     for (int n : numArray){
