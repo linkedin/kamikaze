@@ -9,7 +9,7 @@
     <groupId>com.linkedin.kamikaze</groupId>
     <artifactId>kamikaze</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.7-SNAPSHOT</version>
+    <version>3.0.7</version>
     <name>kamikaze</name>
     <description>information retrival utility package for enhancing Lucene</description>
     <url>http://data.linkedin.com/kamikaze</url>
