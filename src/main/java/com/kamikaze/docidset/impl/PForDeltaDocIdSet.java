@@ -100,9 +100,9 @@ public class PForDeltaDocIdSet extends DocSet implements Serializable {
     offset += (IntArray.getSerialIntNum(res.baseListForOnlyCompBlocks) * Conversion.BYTES_PER_INT);
     
     // 7. the last block (uncompressed) 
-    int noCompBlockSize = Conversion.byteArrayToInt(bytesData, offset);
+    res.sizeOfCurrentNoCompBlock = Conversion.byteArrayToInt(bytesData, offset);
     offset += Conversion.BYTES_PER_INT;
-    for(int i=0; i<noCompBlockSize; i++)
+    for(int i=0; i<res.sizeOfCurrentNoCompBlock; i++)
     {
       res.currentNoCompBlock[i] = Conversion.byteArrayToInt(bytesData, offset);
       offset += Conversion.BYTES_PER_INT;
