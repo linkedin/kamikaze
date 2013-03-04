@@ -1,11 +1,11 @@
 package com.kamikaze.test;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,13 +36,42 @@ public class PForDeltaTestDocSetSerializationTest extends TestCase {
 
 
   @Test
-  public void testNewPForDeltaDocSetSerialization() throws Exception{
-     //using the new static serialize/deserialize methods to test the accuracy of the serializaton and deserialization of PForDeltaDocIdSet objects by verifying if the deserialized object's nextDoc() results match the original object's nextDoc() results
+  public void testNewPForDeltaDocSetSerializationAdvance() throws Exception{
+    //using the new static serialize/deserialize methods to test the accuracy of the serializaton and deserialization of PForDeltaDocIdSet objects by verifying if the deserialized object's nextDoc() results match the original object's nextDoc() results
     int batch = 128;
     System.out.println("");
-    System.out.println("Running test case: serialization/deserialization of PForDeltaDocIdSet objects via nextDoc() ...");
+    System.out.println("Running test case: serialization/deserialization of PForDeltaDocIdSet objects via advance() ...");
     System.out.println("----------------------------");
+    
+    int[] result = makeIntArr();
+    PForDeltaDocIdSet docSetOrigin = serDocSet(batch, result);
+    DocIdSet docSetDeserializd = deserDocSet();
+    StatefulDSIterator dcitOrigin = docSetOrigin.iterator();
+    DocIdSetIterator dcitDeserialized = docSetDeserializd.iterator();
+    
+    try {
+      for (int i = 0; i < result.length; i++) {
+        int docid1 = dcitOrigin.nextDoc();
+        int docid2 = dcitDeserialized.advance(docid1);
+        assertEquals(docid1, result[i]);
+        assertEquals(docid1, docid2);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+    
+    File in = new File(serial);
+    if(in.exists())
+    {
+      in.delete();
+    }
+    System.out.println("-----------------completed--------------------------");
+    
+  }
 
+
+  private int[] makeIntArr() {
     int result[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
         19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
         37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
@@ -103,12 +132,18 @@ public class PForDeltaTestDocSetSerializationTest extends TestCase {
         821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 832, 833, 834,
         835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848,
         849, 850, 851, 852, 853, 854, 855, 856, 857, 858 };
+    return result;
+  }
+
+
+  private PForDeltaDocIdSet serDocSet(int batch, int[] result)
+      throws IOException {
     PForDeltaDocIdSet docSetOrigin = new PForDeltaDocIdSet(batch);
     
     for (int i = 0; i < result.length; i++) {
       docSetOrigin.addDoc(result[i]);
     }
-
+    
     try {
       File f = new File(serial);
       OutputStream os = new FileOutputStream(f);
@@ -122,9 +157,13 @@ public class PForDeltaTestDocSetSerializationTest extends TestCase {
       e.printStackTrace();
       fail(e.getMessage());
     }
+    return docSetOrigin;
+  }
 
+
+  private DocIdSet deserDocSet() {
     DocIdSet docSetDeserializd = null;
-
+    
     try {
       File in = new File(serial);
       InputStream is = new FileInputStream(in);
@@ -138,6 +177,21 @@ public class PForDeltaTestDocSetSerializationTest extends TestCase {
       e.printStackTrace();
       fail(e.getMessage());
     }
+    return docSetDeserializd;
+  }
+  
+  @Test
+  public void testNewPForDeltaDocSetSerialization() throws Exception{
+     //using the new static serialize/deserialize methods to test the accuracy of the serializaton and deserialization of PForDeltaDocIdSet objects by verifying if the deserialized object's nextDoc() results match the original object's nextDoc() results
+    int batch = 128;
+    System.out.println("");
+    System.out.println("Running test case: serialization/deserialization of PForDeltaDocIdSet objects via nextDoc() ...");
+    System.out.println("----------------------------");
+
+    int[] result = makeIntArr();
+    PForDeltaDocIdSet docSetOrigin = serDocSet(batch, result);
+
+    DocIdSet docSetDeserializd = deserDocSet();
 
     StatefulDSIterator dcitOrigin = docSetOrigin.iterator();
     org.apache.lucene.search.DocIdSetIterator dcitDeserialized = docSetDeserializd.iterator();
@@ -180,48 +234,9 @@ public class PForDeltaTestDocSetSerializationTest extends TestCase {
     int dataSize = 15000;
     int[] result = generateRandomDataHY(originalInput,maxDoc, dataSize);
     
-//    int result[] = new int[dataSize];
-//    for(int i=0; i<dataSize; i++)
-//    {
-//      result[i] = i+1;
-//    }
-    PForDeltaDocIdSet docSetOrigin = new PForDeltaDocIdSet(batch);
-    
-    for (int i = 0; i < result.length; i++) {
-      docSetOrigin.addDoc(result[i]);
-    }
+PForDeltaDocIdSet docSetOrigin = serDocSet(batch, result);
 
-    try {
-      File f = new File(serial);
-      OutputStream os = new FileOutputStream(f);
-      byte[] serializedBytes = PForDeltaDocIdSet.serialize(docSetOrigin);
-      
-      os.write(serializedBytes);
-      
-      os.flush();
-      os.close();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
-    DocIdSet docSetDeserializd = null;
-
-    
-    try {
-      File in = new File(serial);
-      InputStream is = new FileInputStream(in);
-      byte[] bytesSize = new byte[Conversion.BYTES_PER_INT]; 
-      is.read(bytesSize);
-      int totalNumInt = Conversion.byteArrayToInt(bytesSize, 0);
-      byte[] bytesData = new byte[totalNumInt * Conversion.BYTES_PER_INT];
-      is.read(bytesData,0,bytesData.length);
-      docSetDeserializd = PForDeltaDocIdSet.deserialize(bytesData, 0);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
+    DocIdSet docSetDeserializd = deserDocSet();
 
     StatefulDSIterator dcitOrigin = docSetOrigin.iterator();
     org.apache.lucene.search.DocIdSetIterator dcitDeserialized = docSetDeserializd.iterator();
