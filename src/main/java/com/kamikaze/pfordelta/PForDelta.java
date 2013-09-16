@@ -65,7 +65,7 @@ public class PForDelta{
     if(hasBigNum)
     {
       currentB = 4;
-      System.out.println("has big num and the currentB is: " + currentB);
+      //System.out.println("has big num and the currentB is: " + currentB);
     }
     else
     {
