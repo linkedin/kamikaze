@@ -70,6 +70,7 @@ public class PForDeltaDocIdSet extends DocSet implements Serializable {
   {
     PForDeltaDocIdSet res = new PForDeltaDocIdSet();
     
+    int startOffset = offset;
     // 1. version
     res.version = Conversion.byteArrayToInt(bytesData, offset);
     offset += Conversion.BYTES_PER_INT;
@@ -114,7 +115,7 @@ public class PForDeltaDocIdSet extends DocSet implements Serializable {
     
     // 9. checksum
     Checksum digest = new CRC32();
-    digest.update(bytesData, 0, offset);
+    digest.update(bytesData, startOffset, offset-startOffset);
     long checksum = digest.getValue();
     
     long receivedChecksum = Conversion.byteArrayToLong(bytesData, offset);
@@ -266,7 +267,6 @@ public class PForDeltaDocIdSet extends DocSet implements Serializable {
   public boolean find(int target)
   { 
     // this func is in PForDeltaDocIdSet instead of in PForDeltaDocIdSetIterator, therefore it cannot use iterBlockIndex, cursor, etc.
-    int[] myDecompBlock = new int[_blockSize]; 
     if(size()==0 || sizeOfCurrentNoCompBlock==0)
       return false;
     
@@ -297,6 +297,7 @@ public class PForDeltaDocIdSet extends DocSet implements Serializable {
    
   // compBlockWithBase.decompressOneBlock(curDecompBlock, sequenceOfCompBlocks.get(iterDecompBlock), _blockSize);
    //compBlockWithBase.decompressOneBlock(myDecompBlock, sequenceOfCompBlocks.get(iterDecompBlock), _blockSize);
+   int[] myDecompBlock = new int[_blockSize]; 
    PForDelta.decompressOneBlock(myDecompBlock, sequenceOfCompBlocks.get(iterDecompBlock), _blockSize);
    
    int idx ;
