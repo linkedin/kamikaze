@@ -12,7 +12,8 @@ The 18th International World Wide Web Conference (WWW'09), Madrid, Spain, April 
 
 Kamikaze is open sourced by LinkedIn Corp : http://data.linkedin.com/opensource/kamikaze.
 
-The principal committer of Kamikaze is Hao Yan. If you have any questions regarding Kamikaze, please email him at hyan@linkedin.com. 
+The principal committer of Kamikaze is Hao Yan. If you have any questions regarding Kamikaze, please email him at hyan@linkedin.com.
+
 ------------------------------------
 
 ### Wiki
